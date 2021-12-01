@@ -215,14 +215,13 @@ LIVE
     For training purpose, you should set empty string for license
 """
 user = {
-    "license" : "your emotivpro license, which could use for third party app",
-    "client_id" : "your client id",
-    "client_secret" : "your client secret",
+    "client_id" : "KD7TAk1pdrSLO42V3XrYJhxv6d15zgmyRsVwRT98",
+    "client_secret" : "vwBoZJiw0fWgKHMweEBRRDkRjGcfk9TK0X95lUcgOuEd2enAqKnYt9T9nsfdaDOtUwd5nie1XFw1wjuQtF7HzATBRbB09L35yHcHRWhAVAFd318ZNrtN7yfEU4sjm6nX",
     "debit" : 100
 }
 
 # name of training profile
-profile_name = 'your trained profile name'
+profile_name = 'Test'
 
 # number of training time for one action
 number_of_train = 1

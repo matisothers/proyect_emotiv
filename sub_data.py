@@ -1,4 +1,19 @@
 from cortex import Cortex
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+import threading
+
+
+def suma(lista):
+    ondas =[0,0,0,0,0]
+    for i in range(14):
+        for j in range(5):
+            ondas[j] += lista[i*5+j]
+    return ondas
+
+
+
 
 class Subcribe():
     """
@@ -33,13 +48,20 @@ class Subcribe():
         Constructs cortex client and bind a function to handle subscribed data streams
         If you do not want to log request and response message , set debug_mode = False. The default is True
         """
-        self.c = Cortex(user, debug_mode=True)
+        self.c = Cortex(user, debug_mode=False)
         self.c.bind(new_data_labels=self.on_new_data_labels)
         self.c.bind(new_eeg_data=self.on_new_eeg_data)
         self.c.bind(new_mot_data=self.on_new_mot_data)
         self.c.bind(new_dev_data=self.on_new_dev_data)
         self.c.bind(new_met_data=self.on_new_met_data)
         self.c.bind(new_pow_data=self.on_new_pow_data)
+        self.theta = []
+        self.alpha = []
+        self.betaL = []
+        self.betaH = []
+        self.gamma = []
+        # self.fig = plt.figure()
+        
 
     def do_prepare_steps(self):
         """
@@ -149,7 +171,11 @@ class Subcribe():
         data = kwargs.get('data')
         print('pm data: {}'.format(data))
 
-    def on_new_pow_data(self, *args, **kwargs):
+
+
+
+
+    def on_new_pow_data(self,*args, **kwargs):
         """
         To handle band power data emitted from Cortex
 
@@ -160,7 +186,43 @@ class Subcribe():
         For example: {'pow': [5.251, 4.691, 3.195, 1.193, 0.282, 0.636, 0.929, 0.833, 0.347, 0.337, 7.863, 3.122, 2.243, 0.787, 0.496, 5.723, 2.87, 3.099, 0.91, 0.516, 5.783, 4.818, 2.393, 1.278, 0.213], 'time': 1627459390.1729}
         """
         data = kwargs.get('data')
-        print('pow data: {}'.format(data))
+
+        data = suma(data['pow'])
+        self.theta.append(data[0])
+        self.alpha.append(data[1])
+        self.betaL.append(data[2])
+        self.betaH.append(data[3])
+        self.gamma.append(data[4])
+
+        
+            
+
+
+
+    def recive(self,i):
+        plt.cla()
+        plt.gca().set_xlim(len(self.alpha)-20,len(self.alpha)+10)
+                        
+        plt.plot(self.alpha, label='alpha')
+        plt.plot(self.theta, label='theta')
+        plt.plot(self.betaL, label='betaL')
+        plt.plot(self.betaH, label='betaH')
+        plt.plot(self.gamma, label='gamma')
+        plt.legend(loc='upper left')
+        plt.tight_layout()
+
+    # def on_new_pow_data(self, *args, **kwargs):
+    #     """
+    #     To handle band power data emitted from Cortex
+
+    #     Returns
+    #     -------
+    #     data: dictionary
+    #          The values in the array pow match the labels in the array labels return at on_new_data_labels
+    #     For example: {'pow': [5.251, 4.691, 3.195, 1.193, 0.282, 0.636, 0.929, 0.833, 0.347, 0.337, 7.863, 3.122, 2.243, 0.787, 0.496, 5.723, 2.87, 3.099, 0.91, 0.516, 5.783, 4.818, 2.393, 1.278, 0.213], 'time': 1627459390.1729}
+    #     """
+    #     data = kwargs.get('data')
+    #     print('pow data: {}'.format(data))
 
 
 # -----------------------------------------------------------
@@ -185,24 +247,43 @@ class Subcribe():
     To subscribe eeg you need to put a valid licese (PRO license)
 """
 user = {
-    "license" : "your emotivpro license, which could use for third party app",
-    "client_id" : "your client id",
-    "client_secret" : "your client secret",
+    "client_id" : "KD7TAk1pdrSLO42V3XrYJhxv6d15zgmyRsVwRT98",
+    "client_secret" : "vwBoZJiw0fWgKHMweEBRRDkRjGcfk9TK0X95lUcgOuEd2enAqKnYt9T9nsfdaDOtUwd5nie1XFw1wjuQtF7HzATBRbB09L35yHcHRWhAVAFd318ZNrtN7yfEU4sjm6nX",
     "debit" : 100
 }
 
 
 
 s = Subcribe()
+ss = Subcribe()
 
 # Do prepare steps
 s.do_prepare_steps()
+ss.do_prepare_steps()
 
 # sub multiple streams
 # streams = ['eeg','mot','met','pow']
 
 # or only sub for eeg
-streams = ['eeg']
+streams = ['pow']
 
-s.sub(streams)
+
+
+
+
+x = threading.Thread(target=s.sub, args=(streams,))
+y = threading.Thread(target=ss.sub, args=(streams,))
+x.start()
+y.start()
+
+# fig2 = plt.figure()
+
+
+a = FuncAnimation(plt.gcf() , s.recive, interval=0)
+# b = FuncAnimation(ss.fig, ss.recive, interval = 0)
+plt.tight_layout()
+plt.show()
+
+
+
 # -----------------------------------------------------------

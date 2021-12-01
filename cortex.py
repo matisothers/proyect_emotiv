@@ -116,7 +116,6 @@ class Cortex(Dispatcher):
             "params": { 
                 "clientId": self.user['client_id'], 
                 "clientSecret": self.user['client_secret'], 
-                "license": self.user['license'],
                 "debit": self.user['debit']
             },
             "id": AUTHORIZE_ID
@@ -203,7 +202,7 @@ class Cortex(Dispatcher):
 
         if len(headsets) > 0:
             # get first element
-            id = input("Which headset will you connect? [0-"+len(headsets)+"]: ")
+            id =int(input("Which headset will you connect? [0-"+str(len(headsets)-1)+"]: "))
             headset_id = headsets[id]['id']
             headset_status = headsets[id]['status']
             
