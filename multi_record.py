@@ -5,6 +5,8 @@ class Record():
 	def __init__(self):
 		self.c = Cortex(user, debug_mode=True)
 		self.c.do_prepare_steps()
+		self.c2 = Cortex(user, debug_mode=True)
+		self.c2.do_prepare_steps()
 
 	def create_record_then_export(self,
 								record_name,
@@ -15,20 +17,34 @@ class Record():
 								record_export_format,
 								record_export_version):
 		
-		self.c.create_record(record_name,
+		self.c.create_record(record_name+" headset_1",
+							record_description)
+
+		self.c2.create_record(record_name+" headset_2",
 							record_description)
 
 		self.wait(record_length_s)
 
 		self.c.stop_record()
 
+		self.c2.stop_record()
+
 		self.c.disconnect_headset()
+
+		self.c2.disconnect_headset()
 
 		self.c.export_record(record_export_folder,
 							record_export_data_types,
 							record_export_format,
 							record_export_version,
 							[self.c.record_id])
+
+
+		self.c2.export_record(record_export_folder,
+							record_export_data_types,
+							record_export_format,
+							record_export_version,
+							[self.c2.record_id])
 
 
 	def wait(self, record_length_s):
@@ -62,14 +78,14 @@ user = {
 r = Record()
 
 # record parameters
-record_name = 'test'
-record_description = 'testingg'
-record_length_s = 10
+record_name = 'your record name'
+record_description = 'your description for record'
+record_length_s = 15
 
 
 # export parameters
-record_export_folder = '\\Users\\matia\\OneDrive\\Escritorio\\Nueva carpeta (2)'
-record_export_data_types = ['PM']
+record_export_folder = '\\.'
+record_export_data_types = ['BP']
 record_export_format = 'CSV'
 record_export_version = 'V2'
 

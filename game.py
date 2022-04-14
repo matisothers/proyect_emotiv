@@ -1,8 +1,10 @@
 from cortex import Cortex
 import threading
+import time
+import random
 
 
-class Train():
+class Game():
     """
     A class to use BCI API to control the training of the mental command detections.
 
@@ -17,12 +19,6 @@ class Train():
         Do prepare steps before training.
     subscribe_data():
         To subscribe to one or more data streams.
-    load_profile(profile_name):
-        To load an existed profile or create new profile for training
-    unload_profile(profile_name):
-        To unload an existed profile or create new profile for training
-    train_mc(profile_name, training_action, number_of_train):
-        To control the training of the mental command action.
     live(profile_name):
         Load a trained profiles then subscribe mental command data to enter live mode
     on_new_data(*args, **kwargs):
@@ -36,6 +32,7 @@ class Train():
         """
         self.c = Cortex(user, debug_mode=False)
         self.c.bind(new_com_data=self.on_new_data)
+        self.time_game = float("inf")
 
     def do_prepare_steps(self):
         """
@@ -69,91 +66,6 @@ class Train():
         """
         self.c.sub_request(streams)
 
-    def load_profile(self, profile_name):
-        """
-        To load an existed profile or create new profile for training
-
-        Parameters
-        ----------
-        profile_name : str, required
-            profile name
-
-        Returns
-        -------
-        None
-        """
-        profiles = self.c.query_profile()
-
-        if profile_name not in profiles:
-            status = 'create'
-            self.c.setup_profile(profile_name, status)
-
-        status = 'load'
-        self.c.setup_profile(profile_name, status)
-
-    def unload_profile(self, profile_name):
-        """
-        To unload an existed profile or create new profile for training
-
-        Parameters
-        ----------
-        profile_name : str, required
-            profile name
-
-        Returns
-        -------
-        None
-        """
-        profiles = self.c.query_profile()
-
-        if profile_name in profiles:
-            status = 'unload'
-            self.c.setup_profile(profile_name, status)
-        else:
-            print("The profile " + profile_name + " is not existed.")
-
-    def train_mc(self, profile_name, training_action, number_of_train):
-        """
-        To control the training of the mental command action.
-        Make sure the headset is at good contact quality. You need to focus during 8 seconds for training an action.
-        For simplicity, the training will be called to accepted automatically and then the training will be saved.
-
-        Parameters
-        ----------
-        profile_name : string, required
-            name of training profile
-        training_action : string, required
-            mental command action, for example: neutral, push, pull, lift...
-        number_of_train : int, required
-            number of training for the action
-        Returns
-        -------
-        None
-        """
-
-        print('begin train -----------------------------------')
-        num_train = 0
-        while num_train < number_of_train:
-            num_train = num_train + 1
-
-            print('start training {0} time {1} ---------------'.format(training_action, num_train))
-            print('\n')
-            status='start'          
-            self.c.train_request(detection='mentalCommand',
-                                action=training_action,
-                                status=status)
-
-            print('accept {0} time {1} ---------------'.format(training_action, num_train))
-            print('\n')
-            status='accept'
-            self.c.train_request(detection='mentalCommand',
-                                action=training_action, 
-                                status=status)
-        
-        print('save trained action')
-        status = "save"
-        self.c.setup_profile(profile_name, status)
-
 
     def live(self, profile_name):
         """
@@ -163,7 +75,7 @@ class Train():
         -------
         None
         """
-        print('begin live mode ----------------------------------')
+        
         # load profile
         status = 'load'
         self.c.setup_profile(profile_name, status)
@@ -182,7 +94,16 @@ class Train():
              the format such as {'action': 'neutral', 'power': 0.0, 'time': 1590736942.8479}
         """
         data = kwargs.get('data')
-        print('mc data: {}'.format(data))
+        # print(data)
+        dt = time.time() - self.time_game 
+        # print(dt)
+        if dt >= 0:
+            # print(dt)
+            if data['action'] == 'push':
+                print("your reaction time was: " + str(dt) + " sec")
+                self.time_game = time.time() + random.random() *15
+    
+                
 
 
 # -----------------------------------------------------------
@@ -223,60 +144,30 @@ user = {
 }
 
 # name of training profile
-profile_name = 'test'
+profile_name = 'Matias Sothers'
 
-# number of training time for one action
-number_of_train = 3
 
 # Init Train
-t=Train()
+g=Game()
 
 # Do prepare steps
-t.do_prepare_steps()
-
-# subscribe sys stream to receive Training Event
-t.subscribe_data(['sys'])
-
-# load existed profile or create a new profile
-t.load_profile(profile_name)
-
-
-# Training neutral action
-training_action = 'neutral'
-t.train_mc(profile_name, training_action, number_of_train)
-
-# # add active action
-
-# Training push action
-training_action = 'push'
-t.train_mc(profile_name, training_action, number_of_train)
+g.do_prepare_steps()
 
 
 
-# Training left action
-training_action = 'left'
-t.train_mc(profile_name, training_action, number_of_train)
+x = threading.Thread(target=g.live, args=(profile_name,))
 
-
-
-training_action = 'right'
-t.train_mc(profile_name, training_action, number_of_train)
-
-
-
-
-# unload profile
-t.unload_profile(profile_name)
-
-
-
-x = threading.Thread(target=t.live,args=(profile_name,))
 x.start()
-# start live mode with profile
-# t.live(profile_name)
+r = random.random() *15
+g.time_game = time.time() + r
+print('********** begin game ***********')
+
+
+
+while True:
+    time.sleep(r)
+    print("******** PUSH NOW! ********")
+    
+
+
 # -----------------------------------------------------------
-
-
-
-
-

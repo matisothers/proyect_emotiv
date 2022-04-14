@@ -18,8 +18,13 @@ import matplotlib.animation as animation
 
 
 class SubplotAnimation(animation.TimedAnimation):
-    def __init__(self,data1,data2):
+    def __init__(self):
         fig, (ax1,ax2) = plt.subplots(2)
+
+        self.data1 = []
+        self.data2 = []
+        self.t = [0,1,2,3,4,5,6]
+
 
         ax1.set_xlabel('x')
         ax1.set_ylabel('y')

@@ -199,17 +199,17 @@ class Subcribe():
 
 
 
-    def recive(self,i):
-        plt.cla()
-        plt.gca().set_xlim(len(self.alpha)-20,len(self.alpha)+10)
+    # def recive(self,i):
+    #     plt.cla()
+    #     plt.gca().set_xlim(len(self.alpha)-20,len(self.alpha)+10)
                         
-        plt.plot(self.alpha, label='alpha')
-        plt.plot(self.theta, label='theta')
-        plt.plot(self.betaL, label='betaL')
-        plt.plot(self.betaH, label='betaH')
-        plt.plot(self.gamma, label='gamma')
-        plt.legend(loc='upper left')
-        plt.tight_layout()
+    #     plt.plot(self.alpha, label='alpha')
+    #     plt.plot(self.theta, label='theta')
+    #     plt.plot(self.betaL, label='betaL')
+    #     plt.plot(self.betaH, label='betaH')
+    #     plt.plot(self.gamma, label='gamma')
+    #     plt.legend(loc='upper left')
+    #     plt.tight_layout()
 
     # def on_new_pow_data(self, *args, **kwargs):
     #     """
@@ -267,6 +267,28 @@ ss.do_prepare_steps()
 # or only sub for eeg
 streams = ['pow']
 
+fig, (ax1, ax2) = plt.subplots(2)
+
+def animate(i):
+    ax1.set_title('Headset 0')
+    ax1.set_xlim(len(s.alpha)-20,len(s.alpha)+10)
+    ax1.set_ylim(0.0,1.0)
+    ax1.plot(s.alpha)
+    ax1.plot(s.theta)
+    ax1.plot(s.betaL)
+    ax1.plot(s.betaH)
+    ax1.plot(s.gamma)
+    # ax1.legend(loc='upper left')
+
+    ax2.set_title('Headset 1')
+    ax2.set_xlim(len(s.alpha)-20,len(s.alpha)+10)
+    ax2.set_ylim(0.0,1.0)
+    ax2.plot(ss.alpha)
+    ax2.plot(ss.theta)
+    ax2.plot(ss.betaL)
+    ax2.plot(ss.betaH)
+    ax2.plot(ss.gamma)
+
 
 
 
@@ -276,11 +298,9 @@ y = threading.Thread(target=ss.sub, args=(streams,))
 x.start()
 y.start()
 
-# fig2 = plt.figure()
 
 
-a = FuncAnimation(plt.gcf() , s.recive, interval=0)
-# b = FuncAnimation(ss.fig, ss.recive, interval = 0)
+a = FuncAnimation(plt.gcf() , animate, interval=0)
 plt.tight_layout()
 plt.show()
 
