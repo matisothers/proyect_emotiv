@@ -1,7 +1,5 @@
-from cProfile import label
-from turtle import color
+import time
 from cortex import Cortex
-import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import threading
@@ -267,20 +265,20 @@ s.do_prepare_steps()
 # streams = ['eeg','mot','met','pow']
 
 # or only sub for eeg
-streams = ['pow']
+streams = ['met']
 
-fig,ax1  = plt.subplots(1)
+# fig,ax1  = plt.subplots(1) 
 
-def animate(i):
-    ax1.set_title('Headset 0')
-    ax1.set_xlim(len(s.d2)-20,len(s.d2)+10)
-    ax1.set_ylim(0.0,1.0)
-    ax1.plot(s.d2,label="alpha",color="red")
-    ax1.plot(s.d1,label="theta",color="blue")
-    ax1.plot(s.betaL,label="betaL",color="green")
-    ax1.plot(s.betaH,label="betaH",color="pink")
-    ax1.plot(s.gamma, label="gamma",color="black")
-    ax1.legend(loc='upper left',labels=["alpha","theta","betaL","betaH","gamma"])
+# def animate(i):
+#     ax1.set_title('Headset 0')
+#     ax1.set_xlim(len(s.d2)-20,len(s.d2)+10)
+#     # ax1.set_ylim(0.0,10.0)
+#     ax1.plot(s.d2,label="alpha",color="red")
+#     ax1.plot(s.d1,label="theta",color="blue")
+#     ax1.plot(s.betaL,label="betaL",color="green")
+#     ax1.plot(s.betaH,label="betaH",color="pink")
+#     ax1.plot(s.gamma, label="gamma",color="black")
+#     ax1.legend(loc='upper left',labels=["alpha","theta","betaL","betaH","gamma"])
 
     # ax2.set_title('Headset 1')
     # ax2.set_xlim(len(s.alpha)-20,len(s.alpha)+10)
@@ -301,10 +299,9 @@ x.start()
 # y.start()
 
 
-if ('pow' in streams ):
-    a = FuncAnimation(plt.gcf() , animate, interval=0)
-    plt.tight_layout()
-    plt.show()
+# a = FuncAnimation(plt.gcf() , animate, interval=0)
+# plt.tight_layout()
+# plt.show()
 
 
 
