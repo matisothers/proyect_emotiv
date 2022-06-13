@@ -734,3 +734,50 @@ class Cortex(Dispatcher):
 # -------------------------------------------------------------------
 # -------------------------------------------------------------------
 # -------------------------------------------------------------------
+
+
+    def query_records(self, query, order_by,limit=0):
+        print('query records --------------------------------')
+        query_records_request = {
+            "jsonrpc": "2.0", 
+            # "id": QUERY_HEADSET_ID,
+            "method": "queryRecords",
+            "params": {
+                "cortexToken": self.auth,
+                "query": query,
+                "orderBy": order_by,
+                'limit': limit
+            }
+        }
+
+        if self.debug:
+            print('query records request \n', json.dumps(query_records_request, indent=4))
+
+        self.ws.send(json.dumps(query_records_request))
+        result = self.ws.recv()
+        result_dic = json.loads(result)
+        if self.debug:
+            print('query records result \n', json.dumps(result_dic, indent=4))
+        return result_dic['result']
+
+
+    def request_download(self,ids):
+        print('Request to download record data -----------')
+        query_records_request = {
+            "jsonrpc": "2.0",
+            "method": "requestToDownloadRecordData",
+            "params": {
+                "cortexToken": self.auth,
+                "recordIds": ids
+            }
+        }
+
+        if self.debug:
+            print('request \n', json.dumps(query_records_request, indent=4))
+
+        self.ws.send(json.dumps(query_records_request))
+        result = self.ws.recv()
+        result_dic = json.loads(result)
+        if self.debug:
+            print('request result \n', json.dumps(result_dic, indent=4))
+        # return 
